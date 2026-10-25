@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم تراخيص aziza tv | Reseller Panel</title>
+    <link rel="stylesheet" href="css/panel.css">
+</head>
+<body>
+
+    <!-- نافذة تسجيل دخول المدير -->
+    <div id="login-modal" class="modal-overlay">
+        <div class="modal-dialog" style="width: 440px; text-align: center;">
+            <div class="brand-badge" style="margin: 0 auto 10px auto; width: 60px; height: 60px; font-size: 30px;">📺</div>
+            <h2 class="modal-title">تسجيل الدخول للوحة الإدارة</h2>
+            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 15px;">لوحة إدارة وبيع تراخيص aziza tv للشاشات الذكية</p>
+
+            <form id="admin-login-form" style="display: flex; flex-direction: column; gap: 15px;">
+                <div class="form-group" style="text-align: right;">
+                    <label class="form-label">اسم المستخدم (Username)</label>
+                    <input type="text" id="admin-user" class="form-input" value="admin" required>
+                </div>
+
+                <div class="form-group" style="text-align: right;">
+                    <label class="form-label">كلمة المرور (Password)</label>
+                    <input type="password" id="admin-pass" class="form-input" value="admin123" required>
+                </div>
+
+                <div id="login-err-msg" style="color: var(--accent-red); font-size: 14px; display: none;"></div>
+
+                <button type="submit" class="btn-primary" style="justify-content: center; height: 50px;">
+                    تسجيل الدخول ◄
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- الهيكل الرئيسي للوحة بعد الدخول -->
+    <header class="panel-header">
+        <div class="brand-wrap">
+            <div class="brand-badge">TV</div>
+            <div>
+                <h1 class="brand-title">aziza tv Reseller Panel</h1>
+                <p class="brand-subtitle">نظام تفعيل وبيع اشتراكات الشاشات عبر عنوان الماك (MAC Address)</p>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <a href="/portal" target="_blank" class="btn-secondary">
+                🌐 بوابة فحص العميل (Portal)
+            </a>
+            <button type="button" id="btn-logout" class="btn-secondary" style="color: var(--accent-red);">
+                🚪 خروج
+            </button>
+        </div>
+    </header>
+
+    <main class="panel-content">
+
+        <!-- بطاقات الإحصائيات الأربع -->
+        <section class="stats-grid">
+            <div class="stat-card stat-total">
+                <div class="stat-info">
+                    <span class="stat-label">إجمالي الأجهزة</span>
+                    <span id="stat-total" class="stat-value">0</span>
+                </div>
+                <div class="stat-icon">📱</div>
+            </div>
+
+            <div class="stat-card stat-active">
+                <div class="stat-info">
+                    <span class="stat-label">التراخيص النشطة</span>
+                    <span id="stat-active" class="stat-value">0</span>
+                </div>
+                <div class="stat-icon">✅</div>
+            </div>
+
+            <div class="stat-card stat-trial">
+                <div class="stat-info">
+                    <span class="stat-label">الفترة التجريبية</span>
+                    <span id="stat-trial" class="stat-value">0</span>
+                </div>
+                <div class="stat-icon">⏳</div>
+            </div>
+
+            <div class="stat-card stat-expired">
+                <div class="stat-info">
+                    <span class="stat-label">أجهزة منتهية</span>
+                    <span id="stat-expired" class="stat-value">0</span>
+                </div>
+                <div class="stat-icon">⚠️</div>
+            </div>
+        </section>
+
+        <!-- شريط الإجراءات والبحث -->
+        <section class="action-bar">
+            <div class="search-box-wrap">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="search-input" class="search-input" placeholder="ابحث بالماوس آدرس (MAC)، اسم العميل، أو رقم الهاتف...">
+            </div>
+
+            <div class="filter-tabs">
+                <button type="button" class="filter-tab active" data-filter="all">الكل</button>
+                <button type="button" class="filter-tab" data-filter="active">المفعلة</button>
+                <button type="button" class="filter-tab" data-filter="trial">التجريبية</button>
+                <button type="button" class="filter-tab" data-filter="expired">المنتهية</button>
+            </div>
+
+            <button type="button" id="btn-add-device" class="btn-primary">
+                ➕ إضافة جهاز ماك جديد
+            </button>
+        </section>
+
+        <!-- جدول الأجهزة المسجلة -->
+        <section class="table-card">
+            <table class="devices-table">
+                <thead>
+                    <tr>
+                        <th>عنوان الماك (MAC)</th>
+                        <th>كود الجهاز (Key)</th>
+                        <th>اسم العميل</th>
+                        <th>الهاتف</th>
+                        <th>نوع الترخيص</th>
+                        <th>تاريخ الانتهاء</th>
+                        <th>السيرفر المرتبط (Xtream)</th>
+                        <th>الحالة</th>
+                        <th style="text-align: center;">الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody id="devices-tbody">
+                    <tr>
+                        <td colspan="9" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                            جاري تحميل الأجهزة...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+    </main>
+
+    <!-- مودال إضافة / تعديل جهاز -->
+    <div id="device-modal" class="modal-overlay hidden">
+        <div class="modal-dialog">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <h3 id="modal-device-title" class="modal-title">إضافة جهاز جديد</h3>
+                <button type="button" id="btn-close-device-modal" style="background: none; border: none; color: #fff; font-size: 20px; cursor: pointer;">✕</button>
+            </div>
+
+            <form id="device-form" style="display: flex; flex-direction: column; gap: 16px;">
+                <input type="hidden" id="edit-device-id">
+
+                <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label class="form-label">الماك آدرس (MAC Address) *</label>
+                        <input type="text" id="device-mac" class="form-input" placeholder="00:1A:79:XX:XX:XX" style="direction: ltr; font-family: monospace;" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">كود الجهاز (Device Key)</label>
+                        <input type="text" id="device-key" class="form-input" placeholder="توليد تلقائي" style="direction: ltr; font-family: monospace;">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label class="form-label">اسم العميل</label>
+                        <input type="text" id="device-customer" class="form-input" placeholder="مثال: محمد علي">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">رقم الهاتف / واتساب</label>
+                        <input type="text" id="device-phone" class="form-input" placeholder="+966500000000" style="direction: ltr;">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">مدة ونوع الترخيص</label>
+                    <select id="device-license" class="form-select">
+                        <option value="yearly">اشتراك سنوي (1 سنة كاملة)</option>
+                        <option value="lifetime">ترخيص دائم مدى الحياة (Lifetime)</option>
+                        <option value="monthly">اشتراك شهري (1 شهر)</option>
+                        <option value="trial">فترة تجريبية مجانية (7 أيام)</option>
+                    </select>
+                </div>
+
+                <!-- ربط باقة Xtream Codes مباشرة مع الجهاز -->
+                <div style="background: rgba(0, 0, 0, 0.3); padding: 15px; border-radius: var(--radius-sm); border: 1px solid rgba(0, 210, 255, 0.15);">
+                    <div style="font-size: 15px; font-weight: 700; color: var(--accent-cyan); margin-bottom: 10px;">
+                        🔗 ربط بيانات اشتراك IPTV (Xtream Codes) - اختياري
+                    </div>
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">
+                        عند وضع بيانات السيرفر هنا، سيتم تشغيل القنوات للعميل فوراً على شاشته دون أن يحتاج لكتابة اسم المستخدم أو السيرفر!
+                    </p>
+
+                    <div class="form-group" style="margin-bottom: 10px;">
+                        <label class="form-label">عنوان السيرفر (Server Host URL)</label>
+                        <input type="text" id="device-server" class="form-input" placeholder="http://server.iptv.com:8080" style="direction: ltr;">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div class="form-group">
+                            <label class="form-label">اسم المستخدم (Username)</label>
+                            <input type="text" id="device-user" class="form-input" placeholder="اسم المستخدم" style="direction: ltr;">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">كلمة المرور (Password)</label>
+                            <input type="text" id="device-pass" class="form-input" placeholder="كلمة المرور" style="direction: ltr;">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">ملاحظات إضافية</label>
+                    <input type="text" id="device-notes" class="form-input" placeholder="ملاحظات حول طريقة الدفع أو الباقة">
+                </div>
+
+                <div style="display: flex; gap: 12px; margin-top: 10px;">
+                    <button type="submit" class="btn-primary" style="flex: 1; justify-content: center;">
+                        حفظ وتفعيل الجهاز
+                    </button>
+                    <button type="button" id="btn-cancel-device-modal" class="btn-secondary">
+                        إلغاء
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- تنبيه Toast -->
+    <div id="toast-msg" style="position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #1f2937; border: 1px solid var(--accent-cyan); color: #fff; padding: 12px 28px; border-radius: 30px; font-weight: 700; z-index: 1000; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5);"></div>
+
+    <script src="js/panel.js"></script>
+</body>
+</html>

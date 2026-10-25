@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: aziza-tv-panel
+    runtime: node
+    plan: free
+    buildCommand: "echo 'No build required'"
+    startCommand: "node server.js"
+    envVars:
+      - key: NODE_ENV
+        value: production

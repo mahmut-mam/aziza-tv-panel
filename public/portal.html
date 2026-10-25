@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوابة فحص وتفعيل aziza tv | Device Portal</title>
+    <link rel="stylesheet" href="css/panel.css">
+    <style>
+        .portal-card {
+            width: 580px;
+            max-width: 95vw;
+            background: var(--bg-card);
+            border: var(--border-glass);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(20px);
+            margin: 60px auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+    </style>
+</head>
+<body style="justify-content: center; align-items: center; padding: 20px;">
+
+    <div class="portal-card">
+        <div style="text-align: center;">
+            <div class="brand-badge" style="margin: 0 auto 12px auto; width: 65px; height: 65px; font-size: 32px;">📺</div>
+            <h1 style="font-size: 26px; font-weight: 800;">بوابة تفعيل aziza tv</h1>
+            <p style="color: var(--text-secondary); font-size: 15px; margin-top: 6px;">
+                تحقق من حالة اشتراك جهازك أو قم بربط وتحديث بيانات باقة IPTV الخاصة بك
+            </p>
+        </div>
+
+        <form id="portal-form" style="display: flex; flex-direction: column; gap: 16px;">
+            <div class="form-group">
+                <label class="form-label">عنوان الماك آدرس الخاص بشاشتك (MAC Address)</label>
+                <input type="text" id="portal-mac" class="form-input" placeholder="00:1A:79:XX:XX:XX" style="direction: ltr; font-family: monospace; font-size: 18px;" required>
+                <small style="color: var(--text-muted); font-size: 12px;">ستجد هذا العنوان ظاهراً في شاشة تفعيل التطبيق على التلفزيون</small>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">كود الجهاز السري (Device Key)</label>
+                <input type="text" id="portal-key" class="form-input" placeholder="مثال: 849201" style="direction: ltr; font-family: monospace; font-size: 18px;" required>
+            </div>
+
+            <button type="submit" class="btn-primary" style="justify-content: center; height: 50px; font-size: 18px;">
+                🔍 فحص حالة الجهاز وتحديث الباقة
+            </button>
+        </form>
+
+        <div id="portal-result" class="hidden" style="background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border-glass); border-radius: var(--radius-sm); padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="color: var(--text-secondary); font-size: 14px;">حالة التفعيل:</span>
+                <span id="res-status" class="badge-status status-active">مفعل</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="color: var(--text-secondary); font-size: 14px;">تاريخ انتهاء الترخيص:</span>
+                <span id="res-expiry" style="font-weight: 700; color: var(--accent-gold);">-</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="color: var(--text-secondary); font-size: 14px;">اسم المشترك:</span>
+                <span id="res-name" style="font-weight: 700;">-</span>
+            </div>
+
+            <hr style="border: none; border-top: 1px solid rgba(255, 255, 255, 0.08); margin: 6px 0;">
+
+            <div style="text-align: center;">
+                <a id="btn-renew-whatsapp" href="https://wa.me/966500000000" target="_blank" class="btn-primary" style="background: linear-gradient(90deg, #25D366, #128C7E); justify-content: center; height: 46px; text-decoration: none;">
+                    💬 تجديد الترخيص عبر واتساب
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('portal-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            var mac = document.getElementById('portal-mac').value.trim();
+            var key = document.getElementById('portal-key').value.trim();
+            var resBox = document.getElementById('portal-result');
+
+            fetch('/api/portal/lookup?mac=' + encodeURIComponent(mac) + '&key=' + encodeURIComponent(key))
+                .then(res => {
+                    if (!res.ok) throw new Error('الماك آدرس أو كود الجهاز غير مسجل.');
+                    return res.json();
+                })
+                .then(data => {
+                    resBox.classList.remove('hidden');
+                    document.getElementById('res-name').textContent = data.customerName || 'عميل';
+                    document.getElementById('res-expiry').textContent = new Date(data.expireDate).toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+
+                    var stEl = document.getElementById('res-status');
+                    var isExpired = new Date(data.expireDate).getTime() < new Date().getTime();
+
+                    if (isExpired) {
+                        stEl.className = 'badge-status status-expired';
+                        stEl.textContent = 'منتهي الصلاحية';
+                    } else if (data.status === 'trial') {
+                        stEl.className = 'badge-status status-trial';
+                        stEl.textContent = 'فترة تجريبية مجانية';
+                    } else {
+                        stEl.className = 'badge-status status-active';
+                        stEl.textContent = 'مفعل ونشط ✔';
+                    }
+                })
+                .catch(err => {
+                    alert(err.message);
+                });
+        });
+    </script>
+</body>
+</html>
