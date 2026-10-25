@@ -20,6 +20,7 @@ const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
 const PORT = process.env.PORT || 3000;
 const DB_FILE = path.join(__dirname, 'database.json');
 const PUBLIC_DIR = path.join(__dirname, 'public');
+const DB_SEED_FILE = process.env.DB_SEED_FILE || '/etc/secrets/aziza-database-seed.json';
 const AUTH_FILE = path.join(__dirname, 'admin-auth.json');
 let adminCredential = null;
 if (fs.existsSync(AUTH_FILE)) {
@@ -43,6 +44,11 @@ function readDB() {
                 settings: { appName: 'aziza tv', trialDays: 7, whatsappContact: '+966500000000' },
                 devices: []
             };
+            if (fs.existsSync(DB_SEED_FILE)) {
+                initial = JSON.parse(fs.readFileSync(DB_SEED_FILE, 'utf8'));
+                if (!initial || !initial.settings || !Array.isArray(initial.devices)) throw new Error('Invalid database seed');
+                delete initial.admin;
+            }
             if (!saveDB(initial)) throw new Error('Database initialization failed');
             return initial;
         }
