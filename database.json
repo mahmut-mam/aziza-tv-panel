@@ -7,7 +7,7 @@
     "appName": "aziza tv",
     "trialDays": 7,
     "whatsappContact": "+966500000000",
-    "portalUrl": "http://your-server-ip:3000/portal",
+    "portalUrl": "https://aziza-tv-panel.onrender.com/portal",
     "allowCustomerEditPlaylist": true
   },
   "devices": [
