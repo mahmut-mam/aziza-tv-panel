@@ -1,0 +1,103 @@
+/**
+ * theme.css
+ * نظام التصميم والألوان المخصص لشاشات التلفزيون الذكية 10-Foot UI
+ */
+
+:root {
+    /* لوحة ألوان داكنة فاخرة مريحة للعين في الصالات */
+    --bg-main: #070a13;
+    --bg-surface: rgba(16, 24, 44, 0.85);
+    --bg-surface-elevated: rgba(25, 36, 64, 0.95);
+    --bg-card: rgba(20, 30, 55, 0.75);
+    
+    /* ألوان التمييز والتوهج والتركيز بالريموت */
+    --accent-cyan: #00d2ff;
+    --accent-blue: #0a84ff;
+    --accent-gold: #ffd60a;
+    --accent-green: #30d158;
+    --accent-red: #ff453a;
+    
+    /* توهج التركيز عند الوقوف بالريموت */
+    --focus-border: #00d2ff;
+    --focus-glow: 0 0 25px rgba(0, 210, 255, 0.6);
+    --focus-scale: scale(1.04);
+    
+    /* نصوص وتباعد */
+    --text-primary: #ffffff;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    
+    /* خطوط وتدرجات */
+    --font-family: 'Segoe UI', system-ui, -apple-system, 'Cairo', 'Tajawal', sans-serif;
+    --border-glass: 1px solid rgba(255, 255, 255, 0.1);
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --radius-xl: 28px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    -webkit-user-select: none;
+    outline: none;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background-color: var(--bg-main);
+    background-image: 
+        radial-gradient(circle at 15% 15%, rgba(0, 210, 255, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(10, 132, 255, 0.08) 0%, transparent 45%);
+    font-family: var(--font-family);
+    color: var(--text-primary);
+    direction: rtl;
+    line-height: 1.5;
+    position: relative;
+}
+
+/* تنسيق التركيز الأساسي لكافة عناصر التلفزيون عند التنقل بالريموت */
+.nav-item {
+    transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), 
+                box-shadow 0.2s cubic-bezier(0.2, 0, 0, 1), 
+                border-color 0.2s ease, 
+                background-color 0.2s ease;
+    cursor: pointer;
+}
+
+.nav-item:focus,
+.nav-item.focused {
+    outline: none;
+    border-color: var(--focus-border) !important;
+    box-shadow: var(--focus-glow) !important;
+    transform: var(--focus-scale);
+    z-index: 10;
+}
+
+.nav-item.active-press {
+    transform: scale(0.98) !important;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* أشرطة التمرير مخصصة وأنيقة */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-cyan);
+}

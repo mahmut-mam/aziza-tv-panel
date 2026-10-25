@@ -1,0 +1,266 @@
+/**
+ * player.css
+ * مظهر مشغل الفيديو الاحترافي وقائمة OSD للشاشات الذكية
+ */
+
+.player-fullscreen-wrap {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #000000;
+    z-index: 500;
+    overflow: hidden;
+}
+
+.player-video-canvas {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #000000;
+}
+
+/* طبقة عرض الترجمة المخصصة فوق الفيديو */
+.custom-subtitles-overlay {
+    position: absolute;
+    bottom: 85px;
+    left: 8%;
+    right: 8%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    text-align: center;
+    pointer-events: none;
+    z-index: 510;
+    transition: bottom 0.3s ease;
+}
+
+/* عند ظهور قائمة OSD يرتفع نص الترجمة قليلاً حتى لا يغطيه شريط التحكم */
+.player-fullscreen-wrap:not(.hidden) .player-osd-overlay:not(.hidden-osd) ~ .custom-subtitles-overlay,
+.player-osd-overlay:not(.hidden-osd) + .custom-subtitles-overlay {
+    bottom: 140px;
+}
+
+.custom-subtitle-text {
+    display: inline-block;
+    padding: 6px 20px;
+    border-radius: 8px;
+    font-weight: 700;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.95);
+    line-height: 1.45;
+    max-width: 85%;
+    direction: rtl;
+    white-space: pre-line;
+}
+
+/* أحجام خط الترجمة للشاشات الكبيرة */
+.sub-size-normal { font-size: 24px; }
+.sub-size-large { font-size: 32px; }
+.sub-size-xl { font-size: 42px; }
+
+/* ألوان خط الترجمة */
+.sub-color-yellow { color: #ffd60a !important; }
+.sub-color-white { color: #ffffff !important; }
+.sub-color-cyan { color: #00d2ff !important; }
+
+/* خلفيات الترجمة لزيادة وضوح القراءة في المشاهد الساطعة */
+.sub-bg-dark {
+    background: rgba(0, 0, 0, 0.75);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+.sub-bg-none {
+    background: transparent;
+}
+
+/* قائمة OSD الشفافة فوق الفيديو */
+.player-osd-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 35px 50px;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 35%, rgba(0, 0, 0, 0) 65%, rgba(0, 0, 0, 0.9) 100%);
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+    z-index: 520;
+}
+
+.player-osd-overlay.hidden-osd {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* الشريط العلوي في المشغل */
+.player-osd-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.player-meta-box {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.player-logo-img {
+    width: 70px;
+    height: 60px;
+    object-fit: contain;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-sm);
+    padding: 4px;
+}
+
+.player-titles {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.player-title-text {
+    font-size: 32px;
+    font-weight: 800;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+}
+
+.player-category-text {
+    font-size: 18px;
+    color: var(--accent-cyan);
+    font-weight: 600;
+}
+
+.player-live-tag {
+    background: var(--accent-red);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 800;
+    padding: 4px 14px;
+    border-radius: 20px;
+    box-shadow: 0 0 12px var(--accent-red);
+    animation: pulseLive 1.5s infinite;
+}
+
+@keyframes pulseLive {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* شريط التحكم السفلي في المشغل */
+.player-osd-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.player-timeline-wrap {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.player-time-num {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    min-width: 65px;
+    direction: ltr;
+}
+
+.player-progress-bar-bg {
+    flex: 1;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+}
+
+.player-progress-fill {
+    position: absolute;
+    top: 0;
+    right: 0; /* في حالة RTL */
+    left: 0;
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+    border-radius: 4px;
+    box-shadow: 0 0 10px var(--accent-cyan);
+}
+
+.player-controls-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.player-controls-group {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.player-btn {
+    height: 56px;
+    padding: 0 24px;
+    background: rgba(255, 255, 255, 0.12);
+    border: var(--border-glass);
+    border-radius: var(--radius-md);
+    color: #fff;
+    font-size: 19px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    backdrop-filter: blur(10px);
+}
+
+.player-btn-main {
+    background: var(--accent-cyan);
+    color: #070a13;
+    border: none;
+    font-size: 22px;
+}
+
+/* مركز تحميل البث والخطأ */
+.player-center-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    pointer-events: none;
+}
+
+.player-error-box {
+    background: rgba(20, 10, 15, 0.9);
+    border: 1px solid var(--accent-red);
+    padding: 30px 40px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+    pointer-events: auto;
+}
+
+.player-error-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--accent-red);
+}
+
+.player-error-text {
+    font-size: 18px;
+    color: var(--text-secondary);
+}

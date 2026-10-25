@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>aziza tv</title>
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/keyboard.css">
+    <link rel="stylesheet" href="css/player.css">
+</head>
+<body>
+
+    <div class="app-container">
+
+        <!-- الهيدر العلوي للتطبيق -->
+        <header class="app-header">
+            <div class="header-right">
+                <div class="app-branding">
+                    <img src="icon.png" alt="IPTV Logo" class="app-header-logo">
+                    <span class="app-header-title">AZIZA TV</span>
+                </div>
+            </div>
+
+            <div class="header-left">
+                <div id="tv-live-clock" class="live-clock-badge">--:--</div>
+                <div id="header-user-badge" class="user-badge">
+                    <span class="user-status-dot"></span>
+                    <span id="header-user-name">غير مسجل</span>
+                </div>
+                <div id="header-expiry-date" class="expiry-badge">غير متصل</div>
+                <button type="button" id="btn-header-account" class="nav-item btn-secondary" style="height: 42px; padding: 0 16px; font-size: 15px;">
+                    ⚙️ الحساب
+                </button>
+            </div>
+        </header>
+
+        <!-- مساحة عرض الشاشات الرئيسية -->
+        <main class="screens-viewport">
+
+            <!-- 0. شاشة تفعيل ترخيص التلفزيون بالماك آدرس (Device MAC Activation Screen) -->
+            <section id="screen-activation" class="app-screen hidden">
+                <div class="activation-screen-wrap">
+                    <div class="activation-card">
+                        <div class="login-header">
+                            <div class="login-icon-box" style="width: 80px; height: 80px;">
+                                <img src="icon.png" alt="Logo">
+                            </div>
+                            <h1 class="login-title">تفعيل ترخيص شاشة التلفزيون</h1>
+                            <p class="login-subtitle">لتفعيل التطبيق أو ربط باقة اشتراكك، استخدم بيانات هذا الجهاز أدناه</p>
+                        </div>
+
+                        <!-- بيانات الماك وكود الجهاز -->
+                        <div class="mac-credentials-box">
+                            <div class="mac-cred-item">
+                                <span class="mac-cred-label">عنوان الماك (MAC Address)</span>
+                                <span id="act-mac-address" class="mac-cred-val">00:1A:79:B4:C2:11</span>
+                            </div>
+
+                            <div class="mac-cred-item">
+                                <span class="mac-cred-label">كود الجهاز السري (Device Key)</span>
+                                <span id="act-device-key" class="mac-cred-val">849201</span>
+                            </div>
+                        </div>
+
+                        <div id="act-status-msg" class="activation-status-badge checking">
+                            جاري فحص حالة التفعيل مع الخادم...
+                        </div>
+
+                        <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.6;">
+                            أرسل هذه البيانات للبائع لتفعيل جهازك، أو تفضل بزيارة بوابة التفعيل السحابية من جوالك:<br>
+                            <span style="display: inline-block; margin-top: 6px; padding: 4px 12px; background: rgba(229,9,20,0.15); border: 1px solid rgba(229,9,20,0.4); border-radius: 6px; color: #fff; font-family: monospace; font-size: 16px;">https://aziza-tv-panel.onrender.com/portal</span>
+                        </p>
+
+                        <div style="display: flex; gap: 15px; justify-content: center;">
+                            <button type="button" id="btn-recheck-activation" class="nav-item btn-primary" style="flex: 1; height: 55px; font-size: 19px;">
+                                🔄 إعادة فحص التفعيل الآن
+                            </button>
+                            <button type="button" id="btn-activation-manual" class="nav-item btn-secondary" style="height: 55px; font-size: 17px; padding: 0 25px;">
+                                ⚙️ إدخال يدوي لاشتراكك
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 1. شاشة تسجيل الدخول (Xtream Codes Login) -->
+            <section id="screen-login" class="app-screen">
+                <div class="login-screen-wrap">
+                    <div class="login-card">
+                        <div class="login-header">
+                            <div class="login-icon-box">
+                                <img src="icon.png" alt="Logo">
+                            </div>
+                            <h1 class="login-title">تسجيل الدخول Xtream</h1>
+                            <p class="login-subtitle">أدخل بيانات اشتراك IPTV للاتصال بسيرفر المشاهدة</p>
+                        </div>
+
+                        <form class="login-form" onsubmit="return false;">
+                            <div class="form-group">
+                                <label class="form-label">عنوان السيرفر (Server URL)</label>
+                                <input type="text" id="login-server" class="nav-item tv-input" placeholder="http://example.com:8080" value="http://">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">اسم المستخدم (Username)</label>
+                                <input type="text" id="login-username" class="nav-item tv-input" placeholder="اسم المستخدم">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">كلمة المرور (Password)</label>
+                                <input type="password" id="login-password" class="nav-item tv-input" placeholder="كلمة المرور">
+                            </div>
+
+                            <div id="login-error" class="login-error-msg hidden"></div>
+
+                            <button type="button" id="btn-connect" class="nav-item btn-primary">
+                                🚀 اتـصـال وتسجيل الدخول
+                            </button>
+
+                            <button type="button" id="btn-demo" class="nav-item btn-secondary">
+                                ⚡ تجربة فورية مجانية (Demo Mode)
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. الشاشة الرئيسية والبطاقات الكبرى (Home Hub) -->
+            <section id="screen-home" class="app-screen hidden">
+                <div class="home-hub-wrap">
+                    <div class="hub-welcome-box">
+                        <h2 class="hub-welcome-text">مرحباً بك في عالم الترفيه</h2>
+                        <p class="hub-welcome-sub">اختر البوابة التي ترغب في مشاهدتها عبر جهاز التحكم بالريموت</p>
+                    </div>
+
+                    <div class="hub-cards-grid">
+                        <!-- كرت البث المباشر -->
+                        <div id="card-hub-live" class="nav-item hub-card hub-card-live" tabindex="0">
+                            <div class="hub-card-icon-box">📺</div>
+                            <div class="hub-card-info">
+                                <div class="hub-card-title">بث مباشر</div>
+                                <div class="hub-card-desc">مشاهدة جميع القنوات الفضائية والرياضية والإخبارية بجودة عالية</div>
+                            </div>
+                            <div class="hub-card-action-hint">تصفح القنوات ◄</div>
+                        </div>
+
+                        <!-- كرت الأفلام -->
+                        <div id="card-hub-vod" class="nav-item hub-card hub-card-vod" tabindex="0">
+                            <div class="hub-card-icon-box">🎬</div>
+                            <div class="hub-card-info">
+                                <div class="hub-card-title">أفلام (VOD)</div>
+                                <div class="hub-card-desc">مكتبة ضخمة من الأفلام العالمية والعربية بجودة سينمائية مترجمة</div>
+                            </div>
+                            <div class="hub-card-action-hint">مشاهدة الأفلام ◄</div>
+                        </div>
+
+                        <!-- كرت المسلسلات -->
+                        <div id="card-hub-series" class="nav-item hub-card hub-card-series" tabindex="0">
+                            <div class="hub-card-icon-box">🍿</div>
+                            <div class="hub-card-info">
+                                <div class="hub-card-title">مسلسلات</div>
+                                <div class="hub-card-desc">أحدث المواسم والحلقات الكاملة مع متابعة تلقائية للحلقات</div>
+                            </div>
+                            <div class="hub-card-action-hint">تصفح المسلسلات ◄</div>
+                        </div>
+
+                        <!-- كرت المفضلة -->
+                        <div id="card-hub-favorites" class="nav-item hub-card hub-card-fav" tabindex="0">
+                            <div class="hub-card-icon-box">⭐</div>
+                            <div class="hub-card-info">
+                                <div class="hub-card-title">المفضلة</div>
+                                <div class="hub-card-desc">قنواتك وأفلامك المحفوظة للوصول السريع إليها بنقرة واحدة</div>
+                            </div>
+                            <div class="hub-card-action-hint">فتح المفضلة ◄</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. شاشة تصفح قنوات البث المباشر (Live TV Screen) -->
+            <section id="screen-live" class="app-screen hidden">
+                <div class="browser-layout">
+                    <!-- الشريط الجانبي للتصنيفات -->
+                    <aside class="browser-sidebar">
+                        <div class="sidebar-header">
+                            <h3 class="sidebar-title">📁 باقات القنوات</h3>
+                        </div>
+                        <div id="live-categories-list" class="sidebar-list"></div>
+                    </aside>
+
+                    <!-- مساحة القنوات -->
+                    <div class="browser-content">
+                        <div class="content-header">
+                            <div class="content-title-wrap">
+                                <h3 class="content-title">📺 قائمة القنوات</h3>
+                                <span id="live-channel-count" class="content-counter">0 قناة</span>
+                            </div>
+                        </div>
+                        <div class="content-scrollable-area">
+                            <div id="live-channels-grid" class="channels-list-wrap"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. شاشة تصفح الأفلام (Movies / VOD Screen) -->
+            <section id="screen-vod" class="app-screen hidden">
+                <div class="browser-layout">
+                    <aside class="browser-sidebar">
+                        <div class="sidebar-header">
+                            <h3 class="sidebar-title">🎬 تصنيفات الأفلام</h3>
+                        </div>
+                        <div id="vod-categories-list" class="sidebar-list"></div>
+                    </aside>
+
+                    <div class="browser-content">
+                        <div class="content-header">
+                            <div class="content-title-wrap">
+                                <h3 class="content-title">مكتبة الأفلام</h3>
+                                <span id="vod-count" class="content-counter">0 فيلم</span>
+                            </div>
+                        </div>
+                        <div class="content-scrollable-area">
+                            <div id="vod-movies-grid" class="media-grid-wrap"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. شاشة تصفح المسلسلات (Series Screen) -->
+            <section id="screen-series" class="app-screen hidden">
+                <div class="browser-layout">
+                    <aside class="browser-sidebar">
+                        <div class="sidebar-header">
+                            <h3 class="sidebar-title">🍿 تصنيفات المسلسلات</h3>
+                        </div>
+                        <div id="series-categories-list" class="sidebar-list"></div>
+                    </aside>
+
+                    <div class="browser-content">
+                        <div class="content-header">
+                            <div class="content-title-wrap">
+                                <h3 class="content-title">المسلسلات والعروض</h3>
+                                <span id="series-count" class="content-counter">0 مسلسل</span>
+                            </div>
+                        </div>
+                        <div class="content-scrollable-area">
+                            <div id="series-grid" class="media-grid-wrap"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. شاشة المفضلة (Favorites Screen) -->
+            <section id="screen-favorites" class="app-screen hidden">
+                <div class="browser-layout">
+                    <div class="browser-content" style="width: 100%;">
+                        <div class="content-header">
+                            <div class="content-title-wrap">
+                                <h3 class="content-title">⭐ قنوات ومحتوى المفضلة</h3>
+                                <span id="fav-count" class="content-counter">0 عنصر</span>
+                            </div>
+                        </div>
+                        <div class="content-scrollable-area">
+                            <div id="fav-channels-list" class="channels-list-wrap"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- شريط مساعدة أزرار ريموت التلفزيون في الأسفل -->
+        <footer class="remote-help-bar">
+            <div class="help-pill">
+                <span class="help-key-tag">الأسهم ◄▲▼►</span>
+                <span>تنقل</span>
+            </div>
+            <div class="help-pill">
+                <span class="help-key-tag">OK / إدخال</span>
+                <span>اختيار وتأكيد</span>
+            </div>
+            <div class="help-pill">
+                <span class="help-btn-color color-red"></span>
+                <span>رجوع / خروج</span>
+            </div>
+            <div class="help-pill">
+                <span class="help-btn-color color-yellow"></span>
+                <span>إضافة للمفضلة</span>
+            </div>
+            <div class="help-pill">
+                <span class="help-key-tag">Return ↩</span>
+                <span>العودة للخلف</span>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- ===================================================
+         مشغل الفيديو للشاشة الكاملة مع قائمة OSD (Player Screen)
+    =================================================== -->
+    <div id="screen-player" class="player-fullscreen-wrap hidden">
+        <video id="main-video-player" class="player-video-canvas" playsinline></video>
+
+        <!-- طبقة OSD التفاعلية فوق البث -->
+        <div id="player-osd" class="player-osd-overlay">
+            <!-- الهيدر العلوي في المشغل -->
+            <div class="player-osd-top">
+                <div class="player-meta-box">
+                    <img id="player-channel-logo" src="" alt="" class="player-logo-img">
+                    <div class="player-titles">
+                        <div id="player-title" class="player-title-text">اسم القناة</div>
+                        <div id="player-category" class="player-category-text">الباقة الإخبارية</div>
+                    </div>
+                    <span id="player-live-badge" class="player-live-tag">LIVE مباشر</span>
+                </div>
+
+                <button type="button" id="btn-player-close" class="nav-item player-btn">
+                    ✕ إغلاق المشغل
+                </button>
+            </div>
+
+            <!-- مركز المشغل: دائرة التحميل أو الخطأ -->
+            <div id="player-center-wrap" class="player-center-overlay">
+                <div id="player-loader" class="neon-spinner hidden"></div>
+                <div id="player-error-box" class="player-error-box hidden">
+                    <div class="player-error-title">تعذر الاتصال بالبث</div>
+                    <div id="player-error-msg" class="player-error-text">القناة غير متاحة حالياً على السيرفر</div>
+                </div>
+            </div>
+
+            <!-- الجزء السفلي: الخط الزمني وأزرار التحكم -->
+            <div class="player-osd-bottom">
+                <div id="player-timeline-box" class="player-timeline-wrap" style="display: none;">
+                    <span id="player-time-current" class="player-time-num">00:00</span>
+                    <div class="player-progress-bar-bg">
+                        <div id="player-progress-fill" class="player-progress-fill"></div>
+                    </div>
+                    <span id="player-time-total" class="player-time-num">00:00</span>
+                </div>
+
+                <div id="player-controls-container" class="player-controls-row">
+                    <div class="player-controls-group">
+                        <button type="button" id="btn-player-prev" class="nav-item player-btn">
+                            ⏮ القناة السابقة
+                        </button>
+                        <button type="button" id="btn-player-playpause" class="nav-item player-btn player-btn-main">
+                            ⏯ تشغيل / إيقاف
+                        </button>
+                        <button type="button" id="btn-player-next" class="nav-item player-btn">
+                            ⏭ القناة التالية
+                        </button>
+                    </div>
+
+                    <div class="player-controls-group">
+                        <button type="button" id="btn-player-subtitles" class="nav-item player-btn">
+                            💬 الترجمة
+                        </button>
+                        <button type="button" id="btn-player-audio" class="nav-item player-btn">
+                            🔊 الصوت واللغة
+                        </button>
+                        <button type="button" id="btn-player-aspect" class="nav-item player-btn">
+                            ⛶ نسبة العرض
+                        </button>
+                        <button type="button" id="btn-player-favorite" class="nav-item player-btn">
+                            ⭐ المفضلة
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- طبقة عرض نصوص الترجمة على الفيديو -->
+        <div id="custom-subtitles-container" class="custom-subtitles-overlay hidden">
+            <span id="custom-subtitles-text" class="custom-subtitle-text sub-size-large sub-color-yellow sub-bg-dark"></span>
+        </div>
+    </div>
+
+    <!-- ===================================================
+         مودال خيارات وإعدادات الترجمة (Subtitles Settings Modal)
+    =================================================== -->
+    <div id="subtitles-modal" class="modal-overlay hidden">
+        <div class="modal-dialog subtitles-modal-box">
+            <div class="modal-header-row">
+                <h2 class="vod-details-title" style="font-size: 26px;">💬 خيارات وإعدادات الترجمة</h2>
+                <button type="button" id="btn-close-subtitles-modal" class="nav-item btn-secondary" style="height: 42px; padding: 0 18px;">✕ إغلاق</button>
+            </div>
+
+            <!-- مسارات الترجمة المدمجة بالفيلم أو البث -->
+            <div class="settings-section">
+                <h4 class="settings-section-title">مسار الترجمة (Subtitle Track)</h4>
+                <div id="subtitles-tracks-list" class="tracks-selector-grid">
+                    <button type="button" class="nav-item track-option-btn active" data-track="-1">🚫 إيقاف الترجمة</button>
+                </div>
+            </div>
+
+            <!-- تخصيص حجم الخط على التلفزيون -->
+            <div class="settings-section">
+                <h4 class="settings-section-title">حجم خط الترجمة على الشاشة</h4>
+                <div class="style-options-row">
+                    <button type="button" class="nav-item style-option-btn" data-sub-size="normal">متوسط (24px)</button>
+                    <button type="button" class="nav-item style-option-btn active" data-sub-size="large">كبير (32px)</button>
+                    <button type="button" class="nav-item style-option-btn" data-sub-size="xl">ضخم (42px)</button>
+                </div>
+            </div>
+
+            <!-- تخصيص لون الخط -->
+            <div class="settings-section">
+                <h4 class="settings-section-title">لون خط الترجمة</h4>
+                <div class="style-options-row">
+                    <button type="button" class="nav-item style-option-btn active" data-sub-color="yellow" style="color: #ffd60a;">★ أصفر سينمائي</button>
+                    <button type="button" class="nav-item style-option-btn" data-sub-color="white" style="color: #ffffff;">أبيض ناصع</button>
+                    <button type="button" class="nav-item style-option-btn" data-sub-color="cyan" style="color: #00d2ff;">سماوي هادئ</button>
+                </div>
+            </div>
+
+            <!-- خلفية شريط الترجمة لسهولة القراءة -->
+            <div class="settings-section">
+                <h4 class="settings-section-title">خلفية الترجمة لقراءة أوضح في المشاهد الساطعة</h4>
+                <div class="style-options-row">
+                    <button type="button" class="nav-item style-option-btn active" data-sub-bg="dark">شريط مظلل شفاف</button>
+                    <button type="button" class="nav-item style-option-btn" data-sub-bg="none">بدون خلفية</button>
+                </div>
+            </div>
+
+            <!-- خيار إدخال رابط ترجمة خارجي -->
+            <div class="settings-section">
+                <h4 class="settings-section-title">تحميل ملف ترجمة خارجي (Custom SRT / VTT URL)</h4>
+                <div style="display: flex; gap: 12px;">
+                    <input type="text" id="input-custom-sub-url" class="nav-item tv-input" placeholder="http://domain.com/movie_arabic.srt" style="flex: 1; height: 50px; font-size: 16px;">
+                    <button type="button" id="btn-apply-custom-sub" class="nav-item btn-primary" style="height: 50px; padding: 0 20px; font-size: 17px; margin: 0;">تحميل الآن</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================
+         مودال مسارات الصوت وخيارات اللغة (Audio Language Modal)
+    =================================================== -->
+    <div id="audio-modal" class="modal-overlay hidden">
+        <div class="modal-dialog audio-modal-box">
+            <div class="modal-header-row">
+                <h2 class="vod-details-title" style="font-size: 26px;">🔊 مسارات الصوت ولغة العرض</h2>
+                <button type="button" id="btn-close-audio-modal" class="nav-item btn-secondary" style="height: 42px; padding: 0 18px;">✕ إغلاق</button>
+            </div>
+
+            <div class="settings-section">
+                <h4 class="settings-section-title">اختر القناة الصوتية / لغة الدبلجة:</h4>
+                <div id="audio-tracks-list" class="tracks-selector-grid">
+                    <button type="button" class="nav-item track-option-btn active" data-track="0">🔊 المسار الافتراضي (الصوت الأصلي)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================
+         مودال تفاصيل الفيلم (VOD Details Modal)
+    =================================================== -->
+    <div id="vod-details-modal" class="modal-overlay hidden">
+        <div class="modal-dialog vod-details-box">
+            <div class="vod-details-poster-wrap">
+                <img id="vod-modal-poster" src="" alt="Poster">
+            </div>
+            <div class="vod-details-content">
+                <div>
+                    <h2 id="vod-modal-title" class="vod-details-title">عنوان الفيلم</h2>
+                    <div id="vod-modal-rating" class="vod-details-rating">★ 8.5</div>
+                    <p id="vod-modal-desc" class="vod-details-desc">وصف وقصة الفيلم...</p>
+                </div>
+
+                <div class="modal-actions-row">
+                    <button type="button" id="btn-play-movie" class="nav-item btn-primary" style="flex: 1;">
+                        ▶ مشاهدة الفيلم الآن
+                    </button>
+                    <button type="button" id="btn-fav-movie" class="nav-item btn-secondary">
+                        ⭐ المفضلة
+                    </button>
+                    <button type="button" id="btn-close-vod-modal" class="nav-item btn-secondary">
+                        ✕ إغلاق
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================
+         مودال تفاصيل المسلسل والحلقات (Series Details Modal)
+    =================================================== -->
+    <div id="series-details-modal" class="modal-overlay hidden">
+        <div class="modal-dialog series-modal-box">
+            <h2 id="series-modal-title" class="vod-details-title">اسم المسلسل</h2>
+            <p id="series-modal-desc" class="vod-details-desc" style="font-size: 16px; margin-top: 5px;">وصف المسلسل</p>
+
+            <!-- شريط اختيار الموسم -->
+            <div id="series-seasons-tabs" class="series-seasons-bar"></div>
+
+            <!-- قائمة الحلقات -->
+            <div id="series-episodes-list" class="episodes-list-scroll"></div>
+
+            <div class="modal-actions-row" style="margin-top: 15px;">
+                <button type="button" id="btn-close-series-modal" class="nav-item btn-secondary" style="margin: 0 auto; min-width: 200px;">
+                    ✕ إغلاق
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================
+         مودال معلومات الحساب (Account Details Modal)
+    =================================================== -->
+    <div id="account-modal" class="modal-overlay hidden">
+        <div class="modal-dialog account-modal-box">
+            <h2 class="vod-details-title" style="font-size: 26px;">معلومات اشتراك IPTV</h2>
+
+            <div class="account-info-grid">
+                <div class="account-info-item">
+                    <span class="account-info-label">اسم المستخدم:</span>
+                    <span id="acc-username" class="account-info-val">-</span>
+                </div>
+                <div class="account-info-item">
+                    <span class="account-info-label">حالة الحساب:</span>
+                    <span id="acc-status" class="account-info-val" style="color: var(--accent-green);">-</span>
+                </div>
+                <div class="account-info-item">
+                    <span class="account-info-label">تاريخ الانتهاء:</span>
+                    <span id="acc-expiry" class="account-info-val" style="color: var(--accent-gold);">-</span>
+                </div>
+                <div class="account-info-item">
+                    <span class="account-info-label">أقصى اتصالات متزامنة:</span>
+                    <span id="acc-max-cons" class="account-info-val">-</span>
+                </div>
+                <div class="account-info-item">
+                    <span class="account-info-label">عنوان الماك (MAC):</span>
+                    <span id="acc-mac-address" class="account-info-val" style="color: var(--accent-cyan); font-family: monospace;">-</span>
+                </div>
+                <div class="account-info-item">
+                    <span class="account-info-label">كود الجهاز (Key):</span>
+                    <span id="acc-device-key" class="account-info-val" style="color: var(--accent-cyan); font-family: monospace;">-</span>
+                </div>
+                <div class="account-info-item" style="grid-column: span 2;">
+                    <span class="account-info-label">عنوان السيرفر:</span>
+                    <span id="acc-server-url" class="account-info-val">-</span>
+                </div>
+            </div>
+
+            <div class="modal-actions-row">
+                <button type="button" id="btn-logout-confirm" class="nav-item btn-secondary" style="color: var(--accent-red); border-color: rgba(255, 69, 58, 0.4);">
+                    تسجيل الخروج وتبديل الحساب
+                </button>
+                <button type="button" id="btn-close-account-modal" class="nav-item btn-secondary">
+                    إغلاق
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================
+         لوحة المفاتيح الافتراضية للتلفزيون (Virtual TV Keyboard)
+    =================================================== -->
+    <div id="tv-keyboard-overlay" class="keyboard-overlay hidden">
+        <div class="keyboard-container">
+            <div class="keyboard-preview-box">
+                <span class="keyboard-preview-label" style="font-size: 16px; color: var(--text-secondary);">النص المدخل:</span>
+                <span id="tv-keyboard-preview" class="keyboard-preview-text">...</span>
+            </div>
+            <div id="tv-keyboard-grid" class="keyboard-rows-wrap"></div>
+        </div>
+    </div>
+
+    <!-- إشعار Toast السريع -->
+    <div id="tv-toast" class="tv-toast hidden"></div>
+
+    <!-- مؤشر التحميل العالمي -->
+    <div id="app-global-loader" class="global-loader-overlay hidden">
+        <div class="neon-spinner"></div>
+        <div id="app-loader-text" class="loader-text">جاري التحميل...</div>
+    </div>
+
+    <!-- Scripts (محلياً 100% بدون أي حاجة لاتصال خارجي للمكتبات) -->
+    <script src="js/lib/hls.min.js"></script>
+    <script src="js/tizen-keys.js"></script>
+    <script src="js/spatial-nav.js"></script>
+    <script src="js/device-id.js"></script>
+    <script src="js/activation.js"></script>
+    <script src="js/xtream-api.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/keyboard.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+
+</body>
+</html>

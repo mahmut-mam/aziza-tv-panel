@@ -410,6 +410,8 @@ const server = http.createServer((req, res) => {
         filePath = path.join(PUBLIC_DIR, 'index.html');
     } else if (pathname === '/portal' || pathname === '/portal.html') {
         filePath = path.join(PUBLIC_DIR, 'portal.html');
+    } else if (pathname === '/tv' || pathname === '/tv/') {
+        filePath = path.join(PUBLIC_DIR, 'tv', 'index.html');
     } else {
         filePath = path.join(PUBLIC_DIR, pathname);
     }

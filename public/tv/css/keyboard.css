@@ -1,0 +1,93 @@
+/**
+ * keyboard.css
+ * مظهر لوحة المفاتيح الافتراضية للتلفزيون (TV Virtual Keyboard)
+ */
+
+.keyboard-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(20px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: 40px;
+    z-index: 150;
+}
+
+.keyboard-container {
+    width: 900px;
+    background: var(--bg-surface-elevated);
+    border: 1px solid rgba(0, 210, 255, 0.3);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+    padding: 30px 35px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.keyboard-preview-box {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-md);
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.keyboard-preview-text {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--accent-cyan);
+    direction: ltr;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: 35px;
+}
+
+.keyboard-rows-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.keyboard-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.key-btn {
+    flex: 1;
+    height: 54px;
+    background: rgba(255, 255, 255, 0.08);
+    border: var(--border-glass);
+    border-radius: var(--radius-sm);
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.key-btn.btn-action-del {
+    background: rgba(255, 69, 58, 0.2);
+    border-color: rgba(255, 69, 58, 0.4);
+    color: #ff8e88;
+}
+
+.key-btn.btn-action-done {
+    background: linear-gradient(90deg, #00d2ff, #0a84ff);
+    border: none;
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3);
+}
