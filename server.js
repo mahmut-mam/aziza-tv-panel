@@ -88,6 +88,11 @@ const server = http.createServer((req, res) => {
     // 1. واجهات برمجة التطبيقات (REST API)
     // =========================================================================
 
+    // فحص الصحة لخوادم الاستضافة (Render / Cloud Health Check)
+    if (pathname === '/healthz' || pathname === '/health') {
+        return sendJson(200, { status: 'ok', time: new Date().toISOString() });
+    }
+
     // أ) فحص تفعيل جهاز التلفزيون (يتم استدعاؤها من شاشة سامسونج تلقائياً)
     if (pathname === '/api/check' && req.method === 'GET') {
         const queryMac = normalizeMac(parsedUrl.query.mac);
