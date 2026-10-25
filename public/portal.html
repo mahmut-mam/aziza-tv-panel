@@ -96,7 +96,10 @@
                     var stEl = document.getElementById('res-status');
                     var isExpired = new Date(data.expireDate).getTime() < new Date().getTime();
 
-                    if (isExpired) {
+                    if (data.status === 'suspended') {
+                        stEl.className = 'badge-status status-expired';
+                        stEl.textContent = 'موقوف';
+                    } else if (isExpired) {
                         stEl.className = 'badge-status status-expired';
                         stEl.textContent = 'منتهي الصلاحية';
                     } else if (data.status === 'trial') {

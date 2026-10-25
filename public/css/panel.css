@@ -422,3 +422,13 @@ body {
 .hidden {
     display: none !important;
 }
+
+#password-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 14px;
+}
+#password-form .form-input { width: 100%; }
+#password-form button { justify-content: center; }
+#password-message { color: var(--accent-red); min-height: 20px; }

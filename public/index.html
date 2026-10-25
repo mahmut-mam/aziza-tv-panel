@@ -23,7 +23,7 @@
 
                 <div class="form-group" style="text-align: right;">
                     <label class="form-label">كلمة المرور (Password)</label>
-                    <input type="password" id="admin-pass" class="form-input" value="admin123" required>
+                    <input type="password" id="admin-pass" class="form-input" autocomplete="current-password" required>
                 </div>
 
                 <div id="login-err-msg" style="color: var(--accent-red); font-size: 14px; display: none;"></div>
@@ -31,6 +31,21 @@
                 <button type="submit" class="btn-primary" style="justify-content: center; height: 50px;">
                     تسجيل الدخول ◄
                 </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="password-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="password-title">
+        <div class="modal-dialog" style="max-width:480px;padding:30px">
+            <h2 id="password-title">تغيير كلمة مرور لوحة التحكم</h2>
+            <form id="password-form" style="display:flex;flex-direction:column;gap:15px">
+                <label>كلمة المرور الحالية<input class="form-input" id="password-current" type="password" autocomplete="current-password" maxlength="1024" required></label>
+                <label>كلمة المرور الجديدة (12 محرفاً على الأقل)<input class="form-input" id="password-new" type="password" autocomplete="new-password" minlength="12" maxlength="1024" required></label>
+                <label>تأكيد كلمة المرور الجديدة<input class="form-input" id="password-confirm" type="password" autocomplete="new-password" minlength="12" maxlength="1024" required></label>
+                <p>بعد الحفظ، تُغلق جميع جلسات الدخول ويلزم تسجيل الدخول بالكلمة الجديدة.</p>
+                <p id="password-message" role="status"></p>
+                <button class="btn-primary" type="submit" id="password-submit">حفظ كلمة المرور</button>
+                <button class="btn-secondary" type="button" id="password-cancel">إلغاء</button>
             </form>
         </div>
     </div>
@@ -49,6 +64,7 @@
             <a href="/portal" target="_blank" class="btn-secondary">
                 🌐 بوابة فحص العميل (Portal)
             </a>
+            <button type="button" id="btn-change-password" class="btn-secondary">🔒 تغيير كلمة المرور</button>
             <button type="button" id="btn-logout" class="btn-secondary" style="color: var(--accent-red);">
                 🚪 خروج
             </button>

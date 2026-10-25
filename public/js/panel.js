@@ -10,6 +10,28 @@
     var currentFilter = 'all';
     var searchQuery = '';
 
+    function escapeHtml(value) {
+        return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+    }
+
+    function apiFetch(endpoint, options) {
+        options = options || {};
+        options.headers = Object.assign({}, options.headers, { Authorization: 'Bearer ' + (sessionStorage.getItem('admin_token') || '') });
+        return fetch(endpoint, options).then(function (res) {
+            if (!res.ok) {
+                if (res.status === 401) {
+                    sessionStorage.removeItem('admin_token');
+                    if (passwordModal) { passwordModal.classList.add('hidden'); passwordForm.reset(); }
+                    loginModal.classList.remove('hidden');
+                }
+                return res.json().then(function (data) { throw new Error(data.message || 'فشلت العملية'); });
+            }
+            return res;
+        });
+    }
+
     // عناصر DOM
     var loginModal = document.getElementById('login-modal');
     var loginForm = document.getElementById('admin-login-form');
@@ -33,7 +55,7 @@
     loginForm.addEventListener('submit', function (e) {
         e.preventDefault();
         var u = document.getElementById('admin-user').value.trim();
-        var p = document.getElementById('admin-pass').value.trim();
+        var p = document.getElementById('admin-pass').value;
 
         fetch('/api/login', {
             method: 'POST',
@@ -59,13 +81,53 @@
     });
 
     document.getElementById('btn-logout').addEventListener('click', function () {
+        apiFetch('/api/logout', { method: 'POST' }).catch(function () {});
         sessionStorage.removeItem('admin_token');
         loginModal.classList.remove('hidden');
     });
 
+    var passwordModal = document.getElementById('password-modal');
+    var passwordForm = document.getElementById('password-form');
+    var passwordMessage = document.getElementById('password-message');
+    document.getElementById('btn-change-password').addEventListener('click', function () {
+        passwordForm.reset(); passwordMessage.textContent = '';
+        passwordModal.classList.remove('hidden'); document.getElementById('password-current').focus();
+    });
+    document.getElementById('password-cancel').addEventListener('click', function () {
+        passwordForm.reset(); passwordModal.classList.add('hidden'); document.getElementById('btn-change-password').focus();
+    });
+    passwordModal.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && !document.getElementById('password-submit').disabled) {
+            event.preventDefault(); document.getElementById('password-cancel').click();
+        } else if (event.key === 'Tab') {
+            var fields = passwordModal.querySelectorAll('input:not(:disabled),button:not(:disabled)');
+            var first = fields[0], last = fields[fields.length - 1];
+            if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+            else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+        }
+    });
+    passwordForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        var submit = document.getElementById('password-submit');
+        var currentPassword = document.getElementById('password-current').value;
+        var newPassword = document.getElementById('password-new').value;
+        var confirmPassword = document.getElementById('password-confirm').value;
+        if (newPassword !== confirmPassword) { passwordMessage.textContent = 'تأكيد كلمة المرور غير مطابق'; return; }
+        submit.disabled = true; passwordMessage.textContent = 'جاري الحفظ...';
+        apiFetch('/api/admin/password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ currentPassword: currentPassword, newPassword: newPassword, confirmPassword: confirmPassword }) })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                sessionStorage.removeItem('admin_token'); passwordForm.reset(); passwordModal.classList.add('hidden');
+                document.getElementById('admin-pass').value = ''; loginModal.classList.remove('hidden');
+                showToast(data.message); document.getElementById('admin-pass').focus();
+            })
+            .catch(function (error) { passwordMessage.textContent = error.message; })
+            .finally(function () { submit.disabled = false; });
+    });
+
     // جلب قائمة الأجهزة
     function loadDevices() {
-        fetch('/api/devices')
+        apiFetch('/api/devices')
             .then(res => res.json())
             .then(data => {
                 allDevices = data.devices || [];
@@ -116,7 +178,10 @@
             return;
         }
 
-        filtered.forEach(function (dev) {
+        filtered.forEach(function (original) {
+            var dev = Object.assign({}, original);
+            ['mac', 'deviceKey', 'customerName', 'phone', 'licenseType'].forEach(function (key) { dev[key] = escapeHtml(dev[key]); });
+            dev.playlist = Object.assign({}, original.playlist, { username: escapeHtml(original.playlist && original.playlist.username) });
             var tr = document.createElement('tr');
 
             var now = new Date().getTime();
@@ -173,7 +238,7 @@
 
             var btnEdit = tr.querySelector('.btn-edit');
             btnEdit.addEventListener('click', function () {
-                openEditModal(dev);
+                openEditModal(original);
             });
 
             var btnDel = tr.querySelector('.btn-delete');
@@ -189,7 +254,7 @@
     function extendDevice(id) {
         if (!confirm('هل تريد تمديد ترخيص هذا الجهاز لمدة سنة كاملة وتفعيله؟')) return;
 
-        fetch('/api/devices/' + id, {
+        apiFetch('/api/devices/' + id, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ extendYears: 1 })
@@ -200,21 +265,21 @@
                 showToast('تم تمديد الترخيص لسنة إضافية بنجاح ⚡');
                 loadDevices();
             }
-        });
+        }).catch(err => showToast(err.message));
     }
 
     // حذف جهاز
     function deleteDevice(id, mac) {
         if (!confirm('هل أنت متأكد من حذف الجهاز صاحب الماك: ' + mac + ' نهائياً؟')) return;
 
-        fetch('/api/devices/' + id, { method: 'DELETE' })
+        apiFetch('/api/devices/' + id, { method: 'DELETE' })
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
                     showToast('تم حذف الجهاز');
                     loadDevices();
                 }
-            });
+            }).catch(err => showToast(err.message));
     }
 
     // فتح مودال الإضافة
@@ -278,7 +343,7 @@
         var method = editId ? 'PUT' : 'POST';
         var endpoint = editId ? ('/api/devices/' + editId) : '/api/devices';
 
-        fetch(endpoint, {
+        apiFetch(endpoint, {
             method: method,
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
